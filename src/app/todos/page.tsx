@@ -8,7 +8,27 @@ import Task from "../components/Task";
 import MyModal from "../components/Modal";
 
 const page = () => {
-  const myTasks = [{}, {}, {}];
+  const myTasks = [
+    {
+      id: "1",
+      title: "I have to make an app",
+      isCompleted: false,
+      isDeleted: false,
+    },
+    {
+      id: "2",
+      title: "I have to make an web",
+      isCompleted: false,
+      isDeleted: false,
+    },
+    ,
+    {
+      id: "3",
+      title: "I have to make an soft",
+      isCompleted: true,
+      isDeleted: false,
+    },
+  ];
   const [showInfoModal, setShowInfoModal] = useState(false);
   const onClickInfoModal = () => {
     setShowInfoModal(!showInfoModal);
@@ -22,16 +42,16 @@ const page = () => {
           type="outlineGray"
           dismissOnClick={true}
         >
-          <Dropdown.Item>Refreshment</Dropdown.Item>
-          <Dropdown.Item>Work</Dropdown.Item>
-          <Dropdown.Item>Study</Dropdown.Item>
-          <Dropdown.Item>Family</Dropdown.Item>
+          <Dropdown.Item value="Refreshment">Refreshment</Dropdown.Item>
+          <Dropdown.Item value="Work">Work</Dropdown.Item>
+          <Dropdown.Item value="Study">Study</Dropdown.Item>
+          <Dropdown.Item value="Family">Family</Dropdown.Item>
         </Dropdown>
         <TaskStatusButton />
       </div>
       <div className="my-10 space-y-1 max-h-96 overflow-y-auto">
-        {myTasks.map((t, i) => (
-          <Task key={i} />
+        {myTasks?.map((t, i) => (
+          <Task key={i} data={t} />
         ))}
       </div>
 

@@ -1,62 +1,23 @@
-// "use client";
-// import { Button } from "keep-react";
-// import React, { useState } from "react";
-// import { FaCheck, FaEdit, FaRegTrashAlt } from "react-icons/fa";
-// import ConfirmModal from "./Modal";
-
-// const Task = () => {
-//   const time = "Fri Dec 29 2023 22:21:08";
-//   const [showInfoModal, setShowInfoModal] = useState(false);
-
-//   const onClickInfoModal = () => {
-//     setShowInfoModal(!showInfoModal);
-//   };
-//   return (
-//     <div className="flex gap-4 p-3 rounded-md">
-//       <div className="flex gap-1 items-center">
-//         <Button
-//           size="xs"
-//           type="outlineGray"
-//           onClick={onClickInfoModal}
-//           circle={true}
-//         >
-//           <FaRegTrashAlt />
-//         </Button>
-//         <Button size="xs" type="outlineGray" circle={true}>
-//           <FaEdit />
-//         </Button>
-//         <Button size="xs" type="outlineGray" circle={true}>
-//           <FaCheck />
-//         </Button>
-//       </div>
-//       <div>
-//         <h1 className="text-base font-semibold">
-//           Implement the task sadsadsadsa
-//         </h1>
-//         <p className="text-sm font-light">{time}</p>
-//       </div>
-//       <ConfirmModal
-//         title="Do you want to delete the task?"
-//         showInfoModal={showInfoModal}
-//         onClickInfoModal={onClickInfoModal}
-//       />
-//     </div>
-//   );
-// };
-
-// export default Task;
-
 import { Button } from "keep-react";
 import React, { useState } from "react";
 import { FaCheck, FaEdit, FaRegTrashAlt } from "react-icons/fa";
-import ConfirmModal from "./Modal";
 import MyModal from "./Modal";
 
-const Task = () => {
+type taskData = {
+  id: string;
+  title: string;
+  isDeleted: boolean;
+  isCompleted: boolean;
+};
+type TTask = {
+  data?: taskData;
+};
+const Task: React.FC<TTask> = ({ data }) => {
+  const { title, isDeleted, isCompleted, id } = data || {};
   const time = "Fri Dec 29 2023 22:21:08";
   const [showInfoModal, setShowInfoModal] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
-  const [taskText, setTaskText] = useState("Implement the task sadsadsadsa");
+  const [taskText, setTaskText] = useState(title);
 
   const onClickInfoModal = () => {
     setShowInfoModal(!showInfoModal);
@@ -80,6 +41,7 @@ const Task = () => {
       handleSave();
     }
   };
+  const handleComplete = () => {};
 
   return (
     <div className="flex gap-4 p-3 rounded-md">
@@ -95,8 +57,14 @@ const Task = () => {
         <Button size="xs" type="outlineGray" circle={true} onClick={handleEdit}>
           <FaEdit />
         </Button>
-        <Button size="xs" type="outlineGray" circle={true}>
-          <FaCheck />
+        <Button
+          size="xs"
+          type="outlineGray"
+          circle={true}
+          className={`${isCompleted && "bg-indigo-400 hover:bg-indigo-400"} `}
+          onClick={handleComplete}
+        >
+          <FaCheck className={`${isCompleted && "text-white"}`} />
         </Button>
       </div>
       <div>
@@ -111,7 +79,13 @@ const Task = () => {
           />
         ) : (
           <>
-            <h1 className="text-base font-semibold">{taskText}</h1>
+            <h1
+              className={`text-base font-semibold ${
+                isCompleted && "line-through"
+              }`}
+            >
+              {taskText}
+            </h1>
             <p className="text-sm font-light">{time}</p>
           </>
         )}
