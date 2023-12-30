@@ -8,13 +8,15 @@ type taskData = {
   title: string;
   isDeleted: boolean;
   isCompleted: boolean;
+  createdAt: string;
 };
 type TTask = {
   data?: taskData;
+  refetch: () => void;
 };
-const Task: React.FC<TTask> = ({ data }) => {
-  const { title, isDeleted, isCompleted, id } = data || {};
-  const time = "Fri Dec 29 2023 22:21:08";
+const Task: React.FC<TTask> = ({ data, refetch }) => {
+  const { title, isDeleted, isCompleted, id, createdAt } = data || {};
+
   const [showInfoModal, setShowInfoModal] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [taskText, setTaskText] = useState(title);
@@ -42,7 +44,7 @@ const Task: React.FC<TTask> = ({ data }) => {
     }
   };
   const handleComplete = () => {};
-
+  const handleDelete = () => {};
   return (
     <div className="flex gap-4 p-3 rounded-md">
       <div className="flex gap-1 items-center">
@@ -86,7 +88,7 @@ const Task: React.FC<TTask> = ({ data }) => {
             >
               {taskText}
             </h1>
-            <p className="text-sm font-light">{time}</p>
+            <p className="text-sm font-light">{createdAt}</p>
           </>
         )}
       </div>
@@ -96,8 +98,19 @@ const Task: React.FC<TTask> = ({ data }) => {
       >
         <div className="flex items-center md:items-start gap-2">
           <h3 className="text-body-4 md:text-body-2 font-semibold text-metal-900">
-            Are you want to delete the task?
+            Are you sure to delete the task?
           </h3>
+        </div>
+        <div className="flex justify-center gap-4 pt-6">
+          <Button type="outlineGray" size="xs" onClick={onClickInfoModal}>
+            Cancel
+          </Button>
+          <button
+            onClick={handleDelete}
+            className="px-3 py-1 bg-indigo-500 text-white rounded-md"
+          >
+            Delete
+          </button>
         </div>
       </MyModal>
     </div>
