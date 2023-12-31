@@ -1,10 +1,15 @@
 "use client";
 import { Button } from "keep-react";
-import React, { useState } from "react";
+import React from "react";
 
-const TaskStatusButton = () => {
-  const [activeStatus, setActiveStatus] = useState("ALL");
-
+type TStatusProps = {
+  setActiveStatus: (status: string) => void;
+  activeStatus: string;
+};
+const TaskStatusButton: React.FC<TStatusProps> = ({
+  setActiveStatus,
+  activeStatus,
+}) => {
   const handleStatusChange = (status: string) => {
     setActiveStatus(status);
   };
@@ -19,9 +24,9 @@ const TaskStatusButton = () => {
 
   return (
     <div className="">
-      <div className="flex gap-2 items-center">
+      <div className="flex md:gap-2 gap-1 items-center">
         <Button
-          size="sm"
+          size="xs"
           type="outlineGray"
           className={getStatusButtonClass("ALL")}
           onClick={() => handleStatusChange("ALL")}
@@ -29,7 +34,7 @@ const TaskStatusButton = () => {
           ALL
         </Button>
         <Button
-          size="sm"
+          size="xs"
           type="outlineGray"
           circle={true}
           className={getStatusButtonClass("ACTIVE")}
@@ -38,7 +43,7 @@ const TaskStatusButton = () => {
           ACTIVE
         </Button>
         <Button
-          size="sm"
+          size="xs"
           type="outlineGray"
           circle={true}
           className={getStatusButtonClass("COMPLETED")}

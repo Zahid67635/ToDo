@@ -1,33 +1,21 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 "use client";
-import { Button, Dropdown, Label, Spinner, TextInput } from "keep-react";
+import { Button, Label, TextInput } from "keep-react";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import TaskStatusButton from "../components/TaskStatusButton";
 import Task from "../components/Task";
 import MyModal from "../components/Modal";
 import { useForm } from "react-hook-form";
 import { useQuery } from "react-query";
+import Loader from "../components/Loader";
+import { FormData } from "./interfaces";
 
-interface Task {
-  id: string;
-  title: string;
-  isCompleted: boolean;
-  isDeleted: boolean;
-}
-
-interface FormData {
-  title: string;
-  category: string;
-}
 const page: React.FC = () => {
-  const { isLoading, isError, refetch, data, error } = useQuery({
-    queryKey: ["/tasks/alltasks"],
-    queryFn: () =>
-      fetch(`https://658fbf59cbf74b575eca1a39.mockapi.io/api/tasks/alltasks`)
-        .then((res) => res.json())
-        .then((data) => data),
-  });
+  const [activeStatus, setActiveStatus] = useState("ALL");
+  const [selectedCategory, setSelectedCategory] = useState<string>("");
+  const [loading, setLoading] = useState(true);
+  const [showInfoModal, setShowInfoModal] = useState<boolean>(false);
   const {
     register,
     setValue,
@@ -35,17 +23,44 @@ const page: React.FC = () => {
     formState: { errors },
   } = useForm<FormData>();
 
-  const [selectedCategory, setSelectedCategory] = useState<string>("");
+  // set the url for filtering
+  let baseUrl =
+    "https://658fbf59cbf74b575eca1a39.mockapi.io/api/tasks/alltasks";
+  let queryParams = "?isDeleted=false";
 
-  const [showInfoModal, setShowInfoModal] = useState<boolean>(false);
+  if (selectedCategory) {
+    queryParams += `&category=${selectedCategory}`;
+  }
 
+  if (activeStatus === "COMPLETED") {
+    queryParams += "&isCompleted=true";
+  }
+  const url = `${baseUrl}${queryParams}`;
+
+  const {
+    isLoading,
+    isError,
+    refetch,
+    data: AllTasks = [],
+    error,
+  } = useQuery({
+    queryKey: ["/tasks/alltasks"],
+    queryFn: async () => {
+      try {
+        const response = await fetch(url);
+        setLoading(false);
+        return response.json();
+      } catch (error: any) {
+        throw new Error(error);
+      }
+    },
+  });
+  console.log(AllTasks);
   const onClickInfoModal = () => {
     setShowInfoModal(!showInfoModal);
   };
   const onSubmit = handleSubmit((data) => {
-    const id = Math.floor(Math.random() * 10000000).toString();
     const payload = {
-      id,
       ...data,
       isDeleted: false,
       isCompleted: false,
@@ -55,36 +70,49 @@ const page: React.FC = () => {
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedCategory(e.target.value);
   };
+  useEffect(() => {
+    refetch();
+  }, [activeStatus, selectedCategory]);
+
   if (isLoading) {
-    return (
-      <div className="min-h-[60vh] flex items-center justify-center">
-        <Spinner color="info" size="lg" />
-      </div>
-    );
+    return <Loader />;
   }
   if (isError) {
     console.log(error);
   }
   return (
     <div>
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-2">
         <select
           value={selectedCategory}
           onChange={handleChange}
-          className="relative h-10 rounded-lg p-1 font-semibold bg-indigo-400 cursor-pointer shadow-lg text-white px-2 selectSelected outline-none"
+          className="relative h-10 rounded-lg p-1 font-semibold bg-indigo-400 cursor-pointer shadow-lg text-white px-2 selectSelected outline-none w-2/3 md:w-1/5"
         >
-          <option value="">Select Category</option>
+          <option value="">All Category</option>
           <option value="Refreshment">Refreshment</option>
           <option value="Work">Work</option>
           <option value="Study">Study</option>
           <option value="Family">Family</option>
         </select>
-        <TaskStatusButton />
+        <TaskStatusButton
+          setActiveStatus={setActiveStatus}
+          activeStatus={activeStatus}
+        />
       </div>
-      <div className="my-10 space-y-1 max-h-96 overflow-y-auto">
-        {data?.map((d: any) => (
-          <Task key={d.id} data={d} refetch={refetch} />
-        ))}
+      <div className="my-10 space-y-1 max-h-[60vh] overflow-y-auto">
+        {loading ? (
+          <Loader />
+        ) : (
+          <>
+            {Array.isArray(AllTasks) && AllTasks.length > 0 ? (
+              AllTasks.map((d: any) => (
+                <Task key={d.id} data={d} refetch={refetch} />
+              ))
+            ) : (
+              <p>No tasks found</p>
+            )}
+          </>
+        )}
       </div>
 
       <Button size="md" className="mx-auto" onClick={onClickInfoModal}>

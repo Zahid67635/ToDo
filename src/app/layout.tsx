@@ -21,13 +21,13 @@ export default function RootLayout({
     <html lang="en">
       <body className={inter.className}>
         <QueryWrapper>
-          <div className="flex max-w-screen-2xl px-24 mx-auto">
-            <div className="w-1/3 bg-slate-50 pt-10 px-3 min-h-screen">
+          <div className="flex md:max-w-screen-2xl md:px-24 px-2 mx-auto">
+            <div className="w-1/3 bg-slate-50 pt-10 px-3 min-h-screen hidden md:block">
               <Sidebar />
             </div>
             <div className="w-full">
               <Header links={[]} />
-              <div className="p-10">{children}</div>
+              <div className="md:p-10 p-2">{children}</div>
             </div>
           </div>
         </QueryWrapper>

@@ -2,6 +2,7 @@ import { Button } from "keep-react";
 import React, { useState } from "react";
 import { FaCheck, FaEdit, FaRegTrashAlt } from "react-icons/fa";
 import MyModal from "./Modal";
+import { useMutation } from "react-query";
 
 type taskData = {
   id: string;
@@ -35,7 +36,6 @@ const Task: React.FC<TTask> = ({ data, refetch }) => {
 
   const handleSave = () => {
     setIsEditing(false);
-    // Perform any save/update functionality here if needed
   };
 
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -43,8 +43,45 @@ const Task: React.FC<TTask> = ({ data, refetch }) => {
       handleSave();
     }
   };
-  const handleComplete = () => {};
-  const handleDelete = () => {};
+  const { mutateAsync: addTask } = useMutation({
+    mutationFn: async (data: object) => {
+      const res = await fetch(
+        `https://658fbf59cbf74b575eca1a39.mockapi.io/api/tasks/alltasks/${id}`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data),
+        }
+      );
+      return res.json();
+    },
+  });
+  const { mutateAsync: deleteTask } = useMutation({
+    mutationFn: async () => {
+      const res = await fetch(
+        `https://658fbf59cbf74b575eca1a39.mockapi.io/api/tasks/alltasks/${id}`,
+        {
+          method: "DELETE",
+        }
+      );
+      return res.json();
+    },
+  });
+  const handleComplete = async () => {
+    try {
+      const data = { isCompleted: !isCompleted };
+      await addTask(data);
+      refetch();
+    } catch (er) {
+      console.log(er);
+    }
+  };
+
+  const handleDelete = async () => {
+    await deleteTask();
+    setShowInfoModal(!showInfoModal);
+    refetch();
+  };
   return (
     <div className="flex gap-4 p-3 rounded-md">
       <div className="flex gap-1 items-center">
@@ -82,13 +119,13 @@ const Task: React.FC<TTask> = ({ data, refetch }) => {
         ) : (
           <>
             <h1
-              className={`text-base font-semibold ${
+              className={`md:text-base text-sm font-semibold ${
                 isCompleted && "line-through"
               }`}
             >
               {taskText}
             </h1>
-            <p className="text-sm font-light">{createdAt}</p>
+            <p className="md:text-sm text-xs font-light">{createdAt}</p>
           </>
         )}
       </div>

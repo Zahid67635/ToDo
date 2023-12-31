@@ -17,7 +17,7 @@ const Header: React.FC<MyListComponentProps> = () => {
   ];
   return (
     <header className="p-4 text-gray-800 border-b-2">
-      <ul className="items-stretch hidden space-x-3 lg:flex">
+      <ul className="items-stretch space-x-3 flex">
         {links.map((link, index) => (
           <li className="flex" key={index}>
             <Link
