@@ -6,6 +6,8 @@ import { FaAlignJustify, FaCross, FaRedoAlt } from "react-icons/fa";
 import { FaCircleXmark } from "react-icons/fa6";
 
 const MySidebar = () => {
+  let completedTask;
+  let allTasksLength;
   const [translate, setTranslate] = useState(true);
   const {
     isLoading,
@@ -26,12 +28,20 @@ const MySidebar = () => {
       }
     },
   });
-  const completedTask =
-    AllTasks.filter((t: { isCompleted: boolean }) => t.isCompleted === true) ||
-    [];
-  const allTasksLength = AllTasks.length || 0;
+
+  if (AllTasks === "Not found") {
+    completedTask = 0;
+    allTasksLength = 0;
+  } else {
+    completedTask =
+      AllTasks.filter(
+        (t: { isCompleted: boolean }) => t.isCompleted === true
+      ) || [];
+    allTasksLength = AllTasks.length || 0;
+  }
+
   const completedTaskLength = completedTask.length || 0;
-  const pendingTaskLength = AllTasks.length - completedTaskLength || 0;
+  const pendingTaskLength = allTasksLength - completedTaskLength || 0;
 
   return (
     <div>
