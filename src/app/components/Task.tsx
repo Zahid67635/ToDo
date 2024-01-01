@@ -1,6 +1,6 @@
 import { Button } from "keep-react";
 import React, { useState } from "react";
-import { FaCheck, FaEdit, FaRegTrashAlt } from "react-icons/fa";
+import { FaCheck, FaEdit, FaFlag, FaRegTrashAlt } from "react-icons/fa";
 import MyModal from "./Modal";
 import { useMutation } from "react-query";
 
@@ -10,40 +10,19 @@ type taskData = {
   isDeleted: boolean;
   isCompleted: boolean;
   createdAt: string;
+  category: string;
 };
 type TTask = {
   data?: taskData;
   refetch: () => void;
 };
 const Task: React.FC<TTask> = ({ data, refetch }) => {
-  const { title, isDeleted, isCompleted, id, createdAt } = data || {};
+  const { title, isDeleted, isCompleted, id, createdAt, category } = data || {};
 
   const [showInfoModal, setShowInfoModal] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [taskText, setTaskText] = useState(title);
-
-  const onClickInfoModal = () => {
-    setShowInfoModal(!showInfoModal);
-  };
-
-  const handleEdit = () => {
-    setIsEditing(true);
-  };
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setTaskText(e.target.value);
-  };
-
-  const handleSave = () => {
-    setIsEditing(false);
-  };
-
-  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") {
-      handleSave();
-    }
-  };
-  const { mutateAsync: addTask } = useMutation({
+  const { mutateAsync: modifyTask } = useMutation({
     mutationFn: async (data: object) => {
       const res = await fetch(
         `https://658fbf59cbf74b575eca1a39.mockapi.io/api/tasks/alltasks/${id}`,
@@ -67,10 +46,34 @@ const Task: React.FC<TTask> = ({ data, refetch }) => {
       return res.json();
     },
   });
+  const onClickInfoModal = () => {
+    setShowInfoModal(!showInfoModal);
+  };
+
+  const handleEdit = () => {
+    setIsEditing(true);
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setTaskText(e.target.value);
+  };
+
+  const handleSave = async () => {
+    setIsEditing(false);
+    const result = await modifyTask({ title: taskText });
+    refetch();
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      handleSave();
+    }
+  };
+
   const handleComplete = async () => {
     try {
       const data = { isCompleted: !isCompleted };
-      await addTask(data);
+      const result = await modifyTask(data);
       refetch();
     } catch (er) {
       console.log(er);
@@ -83,51 +86,94 @@ const Task: React.FC<TTask> = ({ data, refetch }) => {
     refetch();
   };
   return (
-    <div className="flex gap-4 p-3 rounded-md">
-      <div className="flex gap-1 items-center">
-        <Button
-          size="xs"
-          type="outlineGray"
-          onClick={onClickInfoModal}
-          circle={true}
-        >
-          <FaRegTrashAlt />
-        </Button>
-        <Button size="xs" type="outlineGray" circle={true} onClick={handleEdit}>
-          <FaEdit />
-        </Button>
-        <Button
-          size="xs"
-          type="outlineGray"
-          circle={true}
-          className={`${isCompleted && "bg-indigo-400 hover:bg-indigo-400"} `}
-          onClick={handleComplete}
-        >
-          <FaCheck className={`${isCompleted && "text-white"}`} />
-        </Button>
+    <div className="flex md:flex-row flex-col-reverse gap-4 p-3 rounded-md md:items-center md:justify-between border w-full">
+      <div className="flex md:flex-row flex-col gap-3 items-center md:w-3/4">
+        <div className="md:flex gap-2 items-center hidden">
+          <Button
+            size="xs"
+            type="outlineGray"
+            onClick={onClickInfoModal}
+            circle={true}
+          >
+            <FaRegTrashAlt />
+          </Button>
+          <Button
+            size="xs"
+            type="outlineGray"
+            circle={true}
+            onClick={handleEdit}
+          >
+            <FaEdit />
+          </Button>
+          <Button
+            size="xs"
+            type="outlineGray"
+            circle={true}
+            className={`${isCompleted && "bg-indigo-400 hover:bg-indigo-400"} `}
+            onClick={handleComplete}
+          >
+            <FaCheck className={`${isCompleted && "text-white"}`} />
+          </Button>
+        </div>
+        <div className="w-full">
+          {isEditing ? (
+            <input
+              type="text"
+              value={taskText}
+              onChange={handleInputChange}
+              onBlur={handleSave}
+              onKeyDown={handleKeyPress}
+              className="border border-gray-300 rounded px-2 py-1 w-full"
+            />
+          ) : (
+            <div>
+              <h1
+                className={`md:text-base text-sm font-semibold text-wrap max-w-full break-words ${
+                  isCompleted && "line-through"
+                }`}
+              >
+                {taskText}
+              </h1>
+              <p className="md:text-sm text-xs font-light pt-1">
+                {createdAt?.slice(0, 16)}
+              </p>
+            </div>
+          )}
+        </div>
+        <div className="md:hidden flex gap-2 items-center ">
+          <Button
+            size="xs"
+            type="outlineGray"
+            onClick={onClickInfoModal}
+            circle={true}
+          >
+            <FaRegTrashAlt />
+          </Button>
+          <Button
+            size="xs"
+            type="outlineGray"
+            circle={true}
+            onClick={handleEdit}
+          >
+            <FaEdit />
+          </Button>
+          <Button
+            size="xs"
+            type="outlineGray"
+            circle={true}
+            className={`${isCompleted && "bg-indigo-400 hover:bg-indigo-400"} `}
+            onClick={handleComplete}
+          >
+            <FaCheck className={`${isCompleted && "text-white"}`} />
+          </Button>
+        </div>
       </div>
       <div>
-        {isEditing ? (
-          <input
-            type="text"
-            value={taskText}
-            onChange={handleInputChange}
-            onBlur={handleSave}
-            onKeyDown={handleKeyPress}
-            className="border border-gray-300 rounded px-2 py-1"
-          />
-        ) : (
-          <>
-            <h1
-              className={`md:text-base text-sm font-semibold ${
-                isCompleted && "line-through"
-              }`}
-            >
-              {taskText}
-            </h1>
-            <p className="md:text-sm text-xs font-light">{createdAt}</p>
-          </>
-        )}
+        <FaFlag
+          className={`${
+            category === "High Priority" ? "text-red-500" : "text-yellow-400"
+          } text-xl`}
+        />
       </div>
       <MyModal
         showInfoModal={showInfoModal}

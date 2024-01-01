@@ -19,7 +19,7 @@ const TaskStatusButton: React.FC<TStatusProps> = ({
       activeStatus === status
         ? "bg-indigo-400 hover:bg-indigo-400 text-white"
         : ""
-    }`;
+    } shadow-sm`;
   };
 
   return (

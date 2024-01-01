@@ -4,6 +4,7 @@ import "./globals.css";
 import Header from "./components/Header";
 import Sidebar from "./components/Sidebar";
 import QueryWrapper from "./components/QueryWrapper";
+import MySidebar from "./components/Sidebar";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -22,8 +23,8 @@ export default function RootLayout({
       <body className={inter.className}>
         <QueryWrapper>
           <div className="flex md:max-w-screen-2xl md:px-24 px-2 mx-auto">
-            <div className="w-1/3 bg-slate-50 pt-10 px-3 min-h-screen hidden md:block">
-              <Sidebar />
+            <div className="md:w-1/3 bg-slate-50 pt-10 md:px-3 min-h-screen w-0 md:block">
+              <MySidebar />
             </div>
             <div className="w-full">
               <Header links={[]} />

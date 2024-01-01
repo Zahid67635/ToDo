@@ -7,41 +7,42 @@ import TaskStatusButton from "../components/TaskStatusButton";
 import Task from "../components/Task";
 import MyModal from "../components/Modal";
 import { useForm } from "react-hook-form";
-import { useQuery } from "react-query";
+import { useMutation, useQuery } from "react-query";
 import Loader from "../components/Loader";
 import { FormData } from "./interfaces";
 
 const page: React.FC = () => {
-  const [activeStatus, setActiveStatus] = useState("ALL");
+  const [activeStatus, setActiveStatus] = useState<string>("ALL");
   const [selectedCategory, setSelectedCategory] = useState<string>("");
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [showInfoModal, setShowInfoModal] = useState<boolean>(false);
   const {
     register,
     setValue,
+    reset,
     handleSubmit,
     formState: { errors },
   } = useForm<FormData>();
 
   // set the url for filtering
-  let baseUrl =
-    "https://658fbf59cbf74b575eca1a39.mockapi.io/api/tasks/alltasks";
-  let queryParams = "?isDeleted=false";
+  let url =
+    "https://658fbf59cbf74b575eca1a39.mockapi.io/api/tasks/alltasks?isDeleted=false";
 
   if (selectedCategory) {
-    queryParams += `&category=${selectedCategory}`;
+    url += `&category=${selectedCategory}`;
   }
 
   if (activeStatus === "COMPLETED") {
-    queryParams += "&isCompleted=true";
+    url += "&isCompleted=true";
+  } else if (activeStatus === "ACTIVE") {
+    url += "&isCompleted=false";
   }
-  const url = `${baseUrl}${queryParams}`;
 
   const {
     isLoading,
     isError,
     refetch,
-    data: AllTasks = [],
+    data: allTasks,
     error,
   } = useQuery({
     queryKey: ["/tasks/alltasks"],
@@ -55,18 +56,38 @@ const page: React.FC = () => {
       }
     },
   });
-  console.log(AllTasks);
+
+  //post a task
+  const { mutateAsync: addTask } = useMutation({
+    mutationFn: async (data: object) => {
+      const res = await fetch(
+        `https://658fbf59cbf74b575eca1a39.mockapi.io/api/tasks/alltasks`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data),
+        }
+      );
+      return res.json();
+    },
+  });
+
   const onClickInfoModal = () => {
     setShowInfoModal(!showInfoModal);
   };
-  const onSubmit = handleSubmit((data) => {
+
+  const onNewTaskSubmit = handleSubmit(async (data) => {
     const payload = {
       ...data,
       isDeleted: false,
       isCompleted: false,
     };
-    console.log(payload);
+    await addTask(payload);
+    refetch();
+    reset();
+    setShowInfoModal(!showInfoModal);
   });
+
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedCategory(e.target.value);
   };
@@ -86,13 +107,12 @@ const page: React.FC = () => {
         <select
           value={selectedCategory}
           onChange={handleChange}
-          className="relative h-10 rounded-lg p-1 font-semibold bg-indigo-400 cursor-pointer shadow-lg text-white px-2 selectSelected outline-none w-2/3 md:w-1/5"
+          className="relative h-10 rounded-lg p-1 font-semibold border-2 border-indigo-400 cursor-pointer shadow-sm text-gray-600 px-2 selectSelected outline-none w-2/3 md:w-1/5"
         >
           <option value="">All Category</option>
-          <option value="Refreshment">Refreshment</option>
-          <option value="Work">Work</option>
-          <option value="Study">Study</option>
-          <option value="Family">Family</option>
+          <option value="High Priority">High Priority</option>
+          <option value="Medium Priority">Medium Priority</option>
+          <option value="Low Priority">Low Priority</option>
         </select>
         <TaskStatusButton
           setActiveStatus={setActiveStatus}
@@ -104,8 +124,8 @@ const page: React.FC = () => {
           <Loader />
         ) : (
           <>
-            {Array.isArray(AllTasks) && AllTasks.length > 0 ? (
-              AllTasks.map((d: any) => (
+            {Array.isArray(allTasks) && allTasks.length > 0 ? (
+              allTasks.map((d: any) => (
                 <Task key={d.id} data={d} refetch={refetch} />
               ))
             ) : (
@@ -122,12 +142,12 @@ const page: React.FC = () => {
         onClickInfoModal={onClickInfoModal}
         showInfoModal={showInfoModal}
       >
-        <form onSubmit={onSubmit}>
+        <form onSubmit={onNewTaskSubmit}>
           <div className="mb-4">
             <Label htmlFor="#id-11" value="Add a task" />
             <TextInput
               id="#id-11"
-              placeholder="type your task"
+              placeholder="Type your task"
               color="gray"
               helperText="Info should be short and clear."
               {...register("title", { required: true })}
@@ -145,12 +165,11 @@ const page: React.FC = () => {
               {...register("category", { required: true })}
             >
               <option value="">Select Category</option>
-              <option value="Refreshment">Refreshment</option>
-              <option value="Work">Work</option>
-              <option value="Study">Study</option>
-              <option value="Family">Family</option>
+              <option value="High Priority">High Priority</option>
+              <option value="Medium Priority">Medium Priority</option>
+              <option value="Low Priority">Low Priority</option>
             </select>
-            {errors.title?.type === "required" && (
+            {errors.category?.type === "required" && (
               <p className="text-red-500 text-sm" role="alert">
                 Task Category is required
               </p>
