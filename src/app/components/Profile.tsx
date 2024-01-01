@@ -8,12 +8,6 @@ type TProfile = {
 const Profile: React.FC<TProfile> = ({ setTranslate }) => {
   return (
     <div className="flex justify-center relative">
-      <span
-        className="absolute right-2 top-2 md:hidden"
-        onClick={() => setTranslate(true)}
-      >
-        <FaCircleXmark className=" text-3xl text-gray-500" />
-      </span>
       <div className="flex flex-col justify-center max-w-xs pt-6 px-3 sm:px-12  text-gray-800">
         <Image
           src="/zahid-pic.png"

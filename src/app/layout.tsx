@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import Header from "./components/Header";
-import Sidebar from "./components/Sidebar";
 import QueryWrapper from "./components/QueryWrapper";
 import MySidebar from "./components/Sidebar";
+import { Toaster } from "react-hot-toast";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -28,7 +28,10 @@ export default function RootLayout({
             </div>
             <div className="w-full">
               <Header links={[]} />
-              <div className="md:p-10 p-2">{children}</div>
+              <div className="md:p-10 p-2">
+                <Toaster position="top-center" />
+                {children}
+              </div>
             </div>
           </div>
         </QueryWrapper>

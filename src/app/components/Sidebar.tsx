@@ -1,8 +1,9 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Profile from "./Profile";
 import { useQuery } from "react-query";
-import { FaAlignJustify, FaCross } from "react-icons/fa";
+import { FaAlignJustify, FaCross, FaRedoAlt } from "react-icons/fa";
+import { FaCircleXmark } from "react-icons/fa6";
 
 const MySidebar = () => {
   const [translate, setTranslate] = useState(true);
@@ -31,7 +32,7 @@ const MySidebar = () => {
   const allTasksLength = AllTasks.length || 0;
   const completedTaskLength = completedTask.length || 0;
   const pendingTaskLength = AllTasks.length - completedTaskLength || 0;
-  // flex flex-col justify-center
+
   return (
     <div>
       <div className="absolute top-0 right-0 md:hidden block">
@@ -42,6 +43,7 @@ const MySidebar = () => {
           <FaAlignJustify className="w-5 h-5" />
         </button>
       </div>
+
       <div
         className={`${
           !translate && "md:hidden fixed inset-0 z-50 bg-black bg-opacity-50"
@@ -50,10 +52,22 @@ const MySidebar = () => {
         <div
           className={`absolute inset-y-0 left-0 transform
       ${
-        translate ? "-translate-x-full" : ""
+        translate ? "-translate-x-full" : "bg-gray-100"
       } transition duration-300 ease-in-out
-      md:translate-x-0 md:relative z-20 bg-gray-50 px-3`}
+      md:translate-x-0 md:relative z-20  px-3`}
         >
+          {/* refetch task numbers */}
+          <div className="flex justify-between items-center mt-2">
+            <button
+              onClick={() => refetch()}
+              className="flex items-center gap-1 p-3 focus:outline-none rounded-full bg-indigo-100"
+            >
+              <FaRedoAlt className="w-5 h-5" />
+            </button>
+            <button className=" md:hidden" onClick={() => setTranslate(true)}>
+              <FaCircleXmark className=" text-3xl text-red-400" />
+            </button>
+          </div>
           <Profile setTranslate={setTranslate} />
 
           <div className="flex gap-6 justify-center">

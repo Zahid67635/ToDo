@@ -10,6 +10,7 @@ import { useForm } from "react-hook-form";
 import { useMutation, useQuery } from "react-query";
 import Loader from "../components/Loader";
 import { FormData } from "./interfaces";
+import toast from "react-hot-toast";
 
 const page: React.FC = () => {
   const [activeStatus, setActiveStatus] = useState<string>("ALL");
@@ -82,10 +83,15 @@ const page: React.FC = () => {
       isDeleted: false,
       isCompleted: false,
     };
-    await addTask(payload);
-    refetch();
-    reset();
-    setShowInfoModal(!showInfoModal);
+    const result = await addTask(payload);
+    if (result) {
+      toast.success("Task Added Successfully!");
+      refetch();
+      reset();
+      setShowInfoModal(!showInfoModal);
+    } else {
+      toast.error("Something Wrong");
+    }
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {

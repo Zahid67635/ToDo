@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { FaCheck, FaEdit, FaFlag, FaRegTrashAlt } from "react-icons/fa";
 import MyModal from "./Modal";
 import { useMutation } from "react-query";
+import toast from "react-hot-toast";
 
 type taskData = {
   id: string;
@@ -61,6 +62,7 @@ const Task: React.FC<TTask> = ({ data, refetch }) => {
   const handleSave = async () => {
     setIsEditing(false);
     const result = await modifyTask({ title: taskText });
+    toast.success("Title edited successfully!!");
     refetch();
   };
 
@@ -77,11 +79,13 @@ const Task: React.FC<TTask> = ({ data, refetch }) => {
       refetch();
     } catch (er) {
       console.log(er);
+      toast.error("Something Wrong!");
     }
   };
 
   const handleDelete = async () => {
     await deleteTask();
+    toast.success("Task Deleted Successfully!");
     setShowInfoModal(!showInfoModal);
     refetch();
   };
