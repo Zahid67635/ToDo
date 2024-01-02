@@ -129,7 +129,7 @@ const page: React.FC = () => {
           onChange={handleChange}
           className="relative h-10 rounded-lg p-1 font-semibold border border-indigo-400 cursor-pointer shadow-sm text-gray-600 px-2 selectSelected outline-none w-2/3 md:w-1/5"
         >
-          <option value="">All Category</option>
+          <option value="">Categories</option>
           <option value="High Priority">High Priority</option>
           <option value="Medium Priority">Medium Priority</option>
           <option value="Low Priority">Low Priority</option>
