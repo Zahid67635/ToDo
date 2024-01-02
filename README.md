@@ -22,6 +22,42 @@ pnpm dev
 bun dev
 ```
 
+CodeBase hierarchy:
+
+```bash
+public/
+├── favicon.ico
+└── globals.css
+
+src/
+├── app/
+│   ├── components/
+│   │   ├── Hero.tsx
+│   │   ├── Loader.tsx
+│   │   ├── Modal.tsx
+│   │   ├── Profile.tsx
+│   │   ├── QueryWrapper.tsx
+│   │   ├── Sidebar.tsx
+│   │   ├── Task.tsx
+│   │   └── TaskStatusButton.tsx
+│   └── todos/
+│       ├── interfaces.ts
+│       └── page.tsx
+├── layout.tsx
+└── page.tsx
+
+.eslintrc.json
+.gitignore
+next-env.d.ts
+next.config.js
+package.json
+postcss.config.js
+README.md
+tailwind.config.ts
+tsconfig.json
+yarn.lock
+```
+
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
