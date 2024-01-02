@@ -18,7 +18,7 @@ type TTask = {
   refetch: () => void;
 };
 const Task: React.FC<TTask> = ({ data, refetch }) => {
-  const { title, isDeleted, isCompleted, id, createdAt, category } = data || {};
+  const { title, isCompleted, id, createdAt, category } = data || {};
 
   const [showInfoModal, setShowInfoModal] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
@@ -61,7 +61,7 @@ const Task: React.FC<TTask> = ({ data, refetch }) => {
 
   const handleSave = async () => {
     setIsEditing(false);
-    const result = await modifyTask({ title: taskText });
+    await modifyTask({ title: taskText });
     toast.success("Title edited successfully!!");
     refetch();
   };
@@ -75,7 +75,7 @@ const Task: React.FC<TTask> = ({ data, refetch }) => {
   const handleComplete = async () => {
     try {
       const data = { isCompleted: !isCompleted };
-      const result = await modifyTask(data);
+      await modifyTask(data);
       refetch();
     } catch (er) {
       console.log(er);

@@ -1,15 +1,12 @@
 import Image from "next/image";
 import React from "react";
-import { FaCircleXmark } from "react-icons/fa6";
 
-type TProfile = {
-  setTranslate: React.Dispatch<React.SetStateAction<boolean>>;
-};
-const Profile: React.FC<TProfile> = ({ setTranslate }) => {
+const Profile: React.FC = () => {
   return (
     <div className="flex justify-center relative">
       <div className="flex flex-col justify-center max-w-xs pt-6 px-3 sm:px-12  text-gray-800">
         <Image
+          priority
           src="/zahid-pic.png"
           alt=""
           width={400}

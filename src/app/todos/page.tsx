@@ -15,8 +15,9 @@ import toast from "react-hot-toast";
 const page: React.FC = () => {
   const [activeStatus, setActiveStatus] = useState<string>("ALL");
   const [selectedCategory, setSelectedCategory] = useState<string>("");
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState<boolean>(false);
   const [showInfoModal, setShowInfoModal] = useState<boolean>(false);
+  const [allTasks, setAllTasks] = useState([]);
   const {
     register,
     setValue,
@@ -39,24 +40,37 @@ const page: React.FC = () => {
     url += "&isCompleted=false";
   }
 
-  const {
-    isLoading,
-    isError,
-    refetch,
-    data: allTasks,
-    error,
-  } = useQuery({
+  // fetch all tasks
+  const { isLoading, isError, refetch, data, error } = useQuery({
     queryKey: ["/tasks/alltasks"],
     queryFn: async () => {
       try {
         const response = await fetch(url);
         setLoading(false);
-        return response.json();
+        const result = await response.json();
+        setAllTasks(result);
       } catch (error: any) {
         throw new Error(error);
       }
     },
   });
+
+  const searchedTask = (subTitle: string) => {
+    if (Array.isArray(allTasks)) {
+      const result = allTasks.filter((t: any) =>
+        t.title.toLowerCase().includes(subTitle?.toLowerCase())
+      );
+      if (subTitle == "") {
+        refetch();
+      }
+      return result;
+    }
+  };
+
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const searchedResult = searchedTask(e.target.value) || [];
+    setAllTasks(searchedResult);
+  };
 
   //post a task
   const { mutateAsync: addTask } = useMutation({
@@ -113,16 +127,30 @@ const page: React.FC = () => {
         <select
           value={selectedCategory}
           onChange={handleChange}
-          className="relative h-10 rounded-lg p-1 font-semibold border-2 border-indigo-400 cursor-pointer shadow-sm text-gray-600 px-2 selectSelected outline-none w-2/3 md:w-1/5"
+          className="relative h-10 rounded-lg p-1 font-semibold border border-indigo-400 cursor-pointer shadow-sm text-gray-600 px-2 selectSelected outline-none w-2/3 md:w-1/5"
         >
           <option value="">All Category</option>
           <option value="High Priority">High Priority</option>
           <option value="Medium Priority">Medium Priority</option>
           <option value="Low Priority">Low Priority</option>
         </select>
+
         <TaskStatusButton
           setActiveStatus={setActiveStatus}
           activeStatus={activeStatus}
+        />
+      </div>
+      <div className="md:w-3/5 w-full pt-6">
+        <label htmlFor="search" className="font-medium text-sm">
+          Search Task
+        </label>
+        <input
+          type="text"
+          name="search"
+          id="search"
+          onChange={handleSearch}
+          placeholder="type task title"
+          className="rounded-md focus:outline-none border border-indigo-500 items-stretch h-full py-2 px-2 w-full"
         />
       </div>
       <div className="my-10 space-y-1 max-h-[60vh] overflow-y-auto">
@@ -175,6 +203,7 @@ const page: React.FC = () => {
               <option value="Medium Priority">Medium Priority</option>
               <option value="Low Priority">Low Priority</option>
             </select>
+
             {errors.category?.type === "required" && (
               <p className="text-red-500 text-sm" role="alert">
                 Task Category is required

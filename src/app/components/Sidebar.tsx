@@ -1,21 +1,15 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import Profile from "./Profile";
 import { useQuery } from "react-query";
-import { FaAlignJustify, FaCross, FaRedoAlt } from "react-icons/fa";
+import { FaAlignJustify, FaRedoAlt } from "react-icons/fa";
 import { FaCircleXmark } from "react-icons/fa6";
 
-const MySidebar = () => {
+const MySidebar: React.FC = () => {
   let completedTask;
   let allTasksLength;
   const [translate, setTranslate] = useState(true);
-  const {
-    isLoading,
-    isError,
-    refetch,
-    data: AllTasks = [],
-    error,
-  } = useQuery({
+  const { refetch, data: AllTasks = [] } = useQuery({
     queryKey: ["/tasks"],
     queryFn: async () => {
       try {
@@ -29,6 +23,7 @@ const MySidebar = () => {
     },
   });
 
+  // checking if no data found in the Alltasks
   if (AllTasks === "Not found") {
     completedTask = 0;
     allTasksLength = 0;
@@ -54,11 +49,13 @@ const MySidebar = () => {
         </button>
       </div>
 
+      {/* bg overlay after the sidebar appear in sm screen */}
       <div
         className={`${
           !translate && "md:hidden fixed inset-0 z-50 bg-black bg-opacity-50"
         }`}
       >
+        {/*sidebar in large screen and left-side drawer when the screen in sm */}
         <div
           className={`absolute inset-y-0 left-0 transform
       ${
@@ -66,19 +63,21 @@ const MySidebar = () => {
       } transition duration-300 ease-in-out
       md:translate-x-0 md:relative z-20  px-3`}
         >
-          {/* refetch task numbers */}
           <div className="flex justify-between items-center mt-2">
+            {/* refetch task numbers */}
             <button
               onClick={() => refetch()}
               className="flex items-center gap-1 p-3 focus:outline-none rounded-full bg-indigo-100"
             >
               <FaRedoAlt className="w-5 h-5" />
             </button>
+            {/* toggle button */}
             <button className=" md:hidden" onClick={() => setTranslate(true)}>
               <FaCircleXmark className=" text-3xl text-red-400" />
             </button>
           </div>
-          <Profile setTranslate={setTranslate} />
+          {/* showing user profile */}
+          <Profile />
 
           <div className="flex gap-6 justify-center">
             <div className="p-2">
